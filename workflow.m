@@ -18,7 +18,6 @@ N = 5;                      % Interpolation samples
 thetha = 0.5;               % Spatial filter
 tSymb = 0.1;                % Symbol time
 threshold = -10;            % SIR threshold
-data = rand(100);           % Code data
 framesPerSymbol = calculateFramesPerSymbol(fps,tSymb);
 
 % Code size
