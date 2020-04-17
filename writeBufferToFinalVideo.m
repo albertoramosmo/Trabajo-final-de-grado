@@ -5,7 +5,7 @@ open(video)
 
 for i = 1:size(buffer,4)    
     img = buffer(:,:,:,i); 
-    img(img>1) = 1;                           % Establecemos los límites para que el
+    img(img>1) = 1;                           
     img(img<0) = 0; 
     writeVideo(video,img); 
 end
