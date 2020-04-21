@@ -1,14 +1,16 @@
-function [video] = writeBufferToFinalVideo(buffer)
-video = VideoWriter('snailNuevo','MPEG-4'); 
-video.FrameRate = 25; 
-open(video)
+function writeBufferToFinalVideo(video, buffer)
 
+% Esta función escribe el buffer en el video
+
+% Iteramos sobre el número de frames del buffer
 for i = 1:size(buffer,4)    
     img = buffer(:,:,:,i); 
-    img(img>1) = 1;                           
-    img(img<0) = 0; 
+    % Clipeamos aquellos pixels que pasen del rango dinámico
+    img(img>1) = 1.0;                           
+    img(img<0) = 0.0; 
+    % Escribimos el frame en el vídeo
     writeVideo(video,img); 
 end
-close(video);
+
 end
 

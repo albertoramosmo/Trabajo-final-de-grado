@@ -1,6 +1,12 @@
 %%%%%%% STEGANOGRAPHY WORKFLOW %%%%%%%
 filename = 'mountain100.mp4';
+
+% Video de entrada
 videoObject = VideoReader(filename);
+
+% Video de salida
+outputVideo = VideoWriter('outputVideo.avi');
+open(outputVideo);
 
 % State Machine Status
 % AllowedValues = {waitForData, fillingBuffer, checkingSuitability, encodingData, etc...}
@@ -43,20 +49,28 @@ while hasFrame(videoObject)
     else
         bypassEncoding = true;
     end
+    
     if ~bypassEncoding
         if canWeEncode(frameBuffer,alpha,threshold)     % True condition
             encodedBuffer = steganographicEncoding(frameBuffer,width,height,codeRows,codeCols,alpha,sigma);
-            writeBufferToFinalVideo(encodedBuffer,100);
+            writeBufferToFinalVideo(video, encodedBuffer);
+            % En este punto, ya que hemos escrito lengthBuffer frames y
+            % hemos vaciado teóricamente el buffer, vamos a inicializar el
+            % contador de frames en el buffer para que vuelva a llenarse.
+            framesInBuffer = 0;
         else                                            % False condition
             % Si no puedes codificar, debes escribir en el video el frame
-            % mas viejo dentro de la FIFO. En principio es el primero de la
-            % lista si insertamos por el final.
-            writeFrameToFinalVideo(squeeze(frameBuffer(:,:,:,1)));
+            % mas viejo dentro de la FIFO. Es el último de la lista ya que
+            % hemos hecho una FIFO que "empuja" desde el principio.
+            writeFrameToFinalVideo(video, squeeze(frameBuffer(:,:,:,end)));
         end
     end
 end
+
+close(outputVideo);
+
 %%
-v=VideoReader('prueba.mp4');
+v=VideoReader('outputVideo.avi');
 while(hasFrame(v))
     imshow(readFrame(v));
 end
