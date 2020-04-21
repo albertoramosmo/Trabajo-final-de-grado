@@ -4,25 +4,26 @@ function [cond,SIR]  = canWeEncode(frameBuffer,alpha,threshold)
 % Se tiene que definir un estimador de la perceptibilidad del codigo por un
 % lado, y luego otro estimador de la tasa de error en el receptor.
 % - TASA DE ERROR: Se calcula asumiendo que el receptor pilla los cuadritos
-%                  de c�digo donde van.
+%                  de código donde van.
 % - SIR: Resta de frame final e inicial.
 
 imgInicial = frameBuffer(:,:,:,1);
 imgFinal   = frameBuffer(:,:,:,end);
 imgdiff    = imgFinal - imgInicial;
 
-% Interference
+% Interference Average Power
 I = mean(imgdiff.^2,'all');
-% Signal Power
-S = 0.5*alpha^2;
+
+% Signal Average Power (2 alpha es porque el código, al presentarse
+% invertido en imgInicial e imgFinal, duplica su valor con la diferencia.
+% Además, no hace falta el coeficiente 0.5 porque todos los bits tienen la
+% misma energía).
+S = (2*alpha)^2;
+
 % Calculate Signal-to-Interference-Ratio
 SIR = 10*log10(S/I);
 
 % Condition loop
-if (threshold<SIR<Inf)
-    cond = true;
-else
-    cond = false;
-end
-end
-
+% No hace falta hacer un if-else, ya que la salida es una comparación con
+% un umbral.
+cond = SIR >= threshold;
