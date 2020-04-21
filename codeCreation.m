@@ -1,7 +1,6 @@
 function [code] = codeCreation(codeRows,codeCols)
-codeSize=codeCols*codeRows;
-% Creamos el code entre 0 y 1 con un tamaño de codeSize.
-code = randi([0, 1], [1, codeSize]);
+% Creamos el code entre 0 y 1 con un tamaÃ±o de codeSize.
+code = randi([0, 1], [codeRows, codeCols]);
 
 % Lo convertimos a -1 y 1.
 code(code>1)   = 1.0;                           
