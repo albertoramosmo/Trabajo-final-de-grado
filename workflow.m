@@ -53,7 +53,7 @@ while hasFrame(videoObject)
     if ~bypassEncoding
         if canWeEncode(frameBuffer,alpha,threshold)     % True condition
             encodedBuffer = steganographicEncoding(frameBuffer,width,height,codeRows,codeCols,alpha,sigma);
-            writeBufferToFinalVideo(video, encodedBuffer);
+            writeBufferToFinalVideo(outputVideo, encodedBuffer);
             % En este punto, ya que hemos escrito lengthBuffer frames y
             % hemos vaciado teóricamente el buffer, vamos a inicializar el
             % contador de frames en el buffer para que vuelva a llenarse.
@@ -62,7 +62,7 @@ while hasFrame(videoObject)
             % Si no puedes codificar, debes escribir en el video el frame
             % mas viejo dentro de la FIFO. Es el último de la lista ya que
             % hemos hecho una FIFO que "empuja" desde el principio.
-            writeFrameToFinalVideo(video, squeeze(frameBuffer(:,:,:,end)));
+            writeFrameToFinalVideo(outputVideo, squeeze(frameBuffer(:,:,:,end)));
         end
     end
 end
