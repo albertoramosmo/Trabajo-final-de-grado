@@ -1,4 +1,4 @@
-function [encodedBuffer] = steganographicEncoding(frameBuffer,width,height,codeCols,codeRows,alpha,sigma)
+function [encodedBuffer] = steganographicEncoding(frameBuffer,width,height,codeCols,codeRows,alpha,sigma,N)
 
 % 'L1' y 'L2' será la subdivisión que se realizará, el nuevo cuadrado que
 % se generará.
@@ -34,14 +34,16 @@ else                                                % Resto L2 impar.
     leftover_matrix_L2 = zeros((fix(leftover_L2/2)),width);
     mapped = imgaussfilt([fake_leftover; leftover_matrix_L2; AdaptedInColumns'; leftover_matrix_L2],sigma);
 end
-
+x1 = 1:size(frameBuffer,4);
+x2 = 1:N:size(frameBuffer,4);
 code = mapped*(alpha);
+inter_code = interp1(x1,x2,code);
 
 for i = 1:size(frameBuffer,4)
     if (rem(i,2) == 0)
-        encodedBuffer = (frameBuffer + code)/255;
+        encodedBuffer = (frameBuffer + inter_code)/255;
     else
-        encodedBuffer = (frameBuffer + (code)*(-1))/255;
+        encodedBuffer = (frameBuffer + (inter_code)*(-1))/255;
     end
 end
 end

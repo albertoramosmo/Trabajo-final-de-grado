@@ -52,7 +52,7 @@ while hasFrame(videoObject)
     
     if ~bypassEncoding
         if canWeEncode(frameBuffer,alpha,threshold)     % True condition
-            encodedBuffer = steganographicEncoding(frameBuffer,width,height,codeRows,codeCols,alpha,sigma);
+            encodedBuffer = steganographicEncoding(frameBuffer,width,height,codeRows,codeCols,alpha,sigma,N);
             writeBufferToFinalVideo(outputVideo, encodedBuffer);
             % En este punto, ya que hemos escrito lengthBuffer frames y
             % hemos vaciado teóricamente el buffer, vamos a inicializar el
