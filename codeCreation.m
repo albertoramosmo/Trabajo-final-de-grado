@@ -1,7 +1,3 @@
-function [code] = codeCreation(codeRows,codeCols)
-% Creamos el code entre 0 y 1 con un tama�o de codeSize.
-code = randi([0, 1], [codeCols, codeRows]);
-% Lo convertimos a -1 y 1.
-code(code>1)   = 1.0;
-code(code<=0)  = -1.0;
-end
+function code = codeCreation(codeRows,codeCols)
+% We randomly generate a bipolar code with values {-1,1}
+code = 2.0*(1 - 0.5*randi([0, 1], [codeCols, codeRows]));

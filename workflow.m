@@ -1,4 +1,9 @@
-%%%%%%% STEGANOGRAPHY WORKFLOW %%%%%%%
+%% Trabajo Fin de Grado
+% Author: Alberto Ramos Monagas
+% Tutores: Rafael Perez-Jimenez y Victor Guerra
+% Fecha: Abril 2020
+
+% STEGANOGRAPHY WORKFLOW %
 filename = 'mountain100.mp4';
 
 % Video de entrada
@@ -8,17 +13,14 @@ videoObject = VideoReader(filename);
 outputVideo = VideoWriter('outputVideo.avi');
 open(outputVideo);
 
-% State Machine Status
-% AllowedValues = {waitForData, fillingBuffer, checkingSuitability, encodingData, etc...}
-% The FSM must take into account the incoming data and how its encoding
-% could affect the frame from a user's point of view.
-status = 'waitForData';
-
 % Needed variables to carry out the encoding
 fps     = videoObject.FrameRate;
 width   = videoObject.Width;
 height  = videoObject.Height;
 numChannels = size(videoObject.readFrame,3);
+
+% In this first approach we are using an absolute value for alpha, but it
+% may take the form of a proportional value
 alpha = 5;                  % Intensity
 N = 5;                      % Interpolation samples
 sigma = 0.5;                % Spatial filter
@@ -27,10 +29,28 @@ threshold = -10;            % SIR threshold
 
 framesPerSymbol = calculateFramesPerSymbol(fps,tSymb);
 
-% Code size
-codeRows = 20;
-codeCols = 20;
+% Code size (must be exact log2)
+codeRows = 4;
+codeCols = 4;
 codeSize = codeRows*codeCols;
+
+% We create a random number of data bits to encode, 1000 bits for instance
+dataBuffer = randi([0,1], 1, 1000);
+% Pointer to the next batch of data to encode
+dataPointer = 1;
+
+% These bits will be properly encoded using Hadamard codes in order to be
+% robust againts errors, video image interference, etc...
+% batchSize determines how many bits must be taken on each iteration. This
+% size depends on the encoding procedure. In this version, we are taking 4
+% bits, resulting in 16 different patterns to include into the image. But
+% since we are using Hadamard matrices to determine this and the 'all-ones'
+% symbol is not possible, we new 2^(batchSize+1)
+batchSize = log2(codeSize);
+hadamardMatrix = hadamard(2^(batchSize+1));
+% We keep only 2^batchSize elements from the previous matrix, discarding
+% the firs one ('allones').
+hadamardMatrix = hadamardMatrix(2:2^batchSize);
 
 % frameBuffer
 % This is needed for symbol creation using a space-time approach
@@ -45,14 +65,24 @@ while hasFrame(videoObject)
     
     if framesInBuffer > framesPerSymbol
         framesInBuffer = framesPerSymbol;
-        bypassEncoding = false;
+        
+        [databits, dataPointer] = getDataToEncode(dataBuffer, dataPointer, batchSize);
+        
+        % If dataPointer<0,  it means that we have reached the end
+        if (dataPointer < 0)
+            bypassEncoding = true;
+        else
+            encodedBits = hadamardEncode(databits, hadamardMatrix);
+            bypassEncoding = false;
+        end
+        
     else
         bypassEncoding = true;
     end
     
     if ~bypassEncoding
         if canWeEncode(frameBuffer,alpha,threshold)     % True condition
-            encodedBuffer = steganographicEncoding(frameBuffer,width,height,codeRows,codeCols,alpha,sigma,N);
+            encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,alpha,sigma,N);
             writeBufferToFinalVideo(outputVideo, encodedBuffer);
             % En este punto, ya que hemos escrito lengthBuffer frames y
             % hemos vaciado teóricamente el buffer, vamos a inicializar el

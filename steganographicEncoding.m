@@ -1,52 +1,53 @@
-function [encodedBuffer] = steganographicEncoding(frameBuffer,width,height,codeCols,codeRows,alpha,sigma,N)
+function encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,alpha,sigma,N)
+% This function encodes data
 
-% 'L1' y 'L2' será la subdivisión que se realizará, el nuevo cuadrado que
-% se generará.
-L1 = fix(width/codeCols);
-L2 = fix(height/codeRows);
+% We allocate memory for the encodedBuffer
+encodedBuffer = zeros(size(frameBuffer));
 
-% 'leftover_L1' y 'leftover_L2' serán los restos de la división realizada por
-% anchura/columnas y altura/filas.
-leftover_L1 = mod(width,codeCols);
-leftover_L2 = mod(height,codeRows);
+% We get from frameBuffer the width and heigth of the images
+width = size(frameBuffer, 1);
+heigth = size(frameBuffer, 2);
 
-if (rem(leftover_L1,2) == 0)                        % Resto L1 par.
-    leftover_matrix_L1 = zeros(L2,(leftover_L1/2));
-    mappedCell = codeCreation(L1,L2);            % Función generadora de código
-    % función que me generara un código.
-    rowAdaptedInColumns = repmat(mappedCell, [1 codeCols]);
-    AdaptedInRows = [leftover_matrix_L1 rowAdaptedInColumns leftover_matrix_L1];
-else                                                % Resto L1 impar.
-    fake_leftover_matrix_L1 = zeros(L2,1);
-    leftover_matrix_L1 = zeros(L2,(fix(leftover_L1/2)));
-    mappedCell = codeCreation(L1,L2);             % Función generadora de código
-    rowAdaptedInColumns = repmat(mappedCell, [1 codeCols]);
-    AdaptedInRows = [fake_leftover_matrix_L1 leftover_matrix_L1 rowAdaptedInColumns leftover_matrix_L1];
-end
+% From encodedBits we get the grid size (we must determine if it is a exact
+% square of just an exact log2)
+codeLength = length(encodedBits);
 
-AdaptedInColumns = repmat(AdaptedInRows', [1 codeRows]);
+% This function does what was commented above. It assumes that codeLength
+% is an exact log2, and prioritizes the number of cols vs rows.
+[cols,rows] = getBestColRowFit(codeLength);
 
-if (rem(leftover_L2,2) == 0)                        % Resto L2 par.
-    leftover_matrix_L2 = zeros(fix(leftover_L2/2),width);
-    mapped = imgaussfilt([leftover_matrix_L2; AdaptedInColumns'; leftover_matrix_L2],sigma);
-else                                                % Resto L2 impar.
-    fake_leftover = zeros(1,width);
-    leftover_matrix_L2 = zeros((fix(leftover_L2/2)),width);
-    mapped = imgaussfilt([fake_leftover; leftover_matrix_L2; AdaptedInColumns'; leftover_matrix_L2],sigma);
-end
-x1 = 1:size(frameBuffer,4);
-x2 = 1:N:size(frameBuffer,4);
-code = mapped*(alpha);
-inter_code = interp1(x1,x2,code);
+% Modificamos ahora encodedBits segÃºn cols y rows
+encodedBits = reshape(encodedBits, rows,cols);
 
-for i = 1:size(frameBuffer,4)
-    if (rem(i,2) == 0)
-        encodedBuffer = (frameBuffer + inter_code)/255;
-    else
-        encodedBuffer = (frameBuffer + (inter_code)*(-1))/255;
+% Now we set the colSize and rowSize referred to the image size
+colSize = floor(width/cols);
+rowSize = floor(heigth/rows);
+
+% Now we must generate the codes using the corresponding size
+codeImage = ones(size(frameBuffer,1), ...
+                  size(frameBuffer,2), ...
+                  size(frameBuffer,3));
+
+% We iterate to create our image
+for I = 1:rows
+    for J = 1:cols
+        posRow = (I-1)*rowSize+1;
+        posCol = (J-1)*colSize+1;
+        % Coefficient to multiply the image
+        C = encodedBits(I,J)*alpha;
+        codeImage(posRow:posRow+rowSize-1, posCol:posCol+colSize-1,:) = ...
+            C*codeImage(posRow:posRow+rowSize-1, posCol:posCol+colSize-1,:);
     end
 end
+
+% codeImage is the first one, now we must apply image filtering to reduce
+% the spatial frequency of the image.
+codeImage = imgaussfilt(codeImage, sigma);              
+
+% Finally, we must interpolate
+timeCoeff = linspace(-1, 1, N);
+
+for I = 2:length(timeCoeff)
+    T = timeCoeff(I);
+    encodedBuffer(:,:,:,I) = T*codeImage/255 + frameBuffer(:,:,:,I);
 end
-
-
-

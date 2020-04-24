@@ -75,3 +75,39 @@ delete(video);
 % como el valor 255 en uint8.
 assert(mean(abs(double(frame)/255 - frameBuffer(:,:,:,end)), 'all') < 0.001);
 fprintf('writeFrameToFinalVideo test passed\n');
+
+
+%% getDataToEncode
+% In this test we generate a random vector of length 10, and we iterate
+% checking that everything is OK.
+data = randi([0,1],1,10);
+batchSize = 4;
+% With this distribution, it must get 2 full 4-samples batches, and a final
+% trimmer batch with trailing zeroes.
+
+ptr = 1;
+for I = 1:2
+   slice = data((I-1)*batchSize + 1:I*batchSize);
+   [D,ptr] = getDataToEncode(data, ptr, batchSize);
+   assert(sum(D - slice) == 0);
+end
+
+% Final assertion
+slice = [data(9:10) 0 0];
+[D,ptr] = getDataToEncode(data, ptr, batchSize);
+assert(sum(D - slice) == 0);
+
+fprintf('getDataToEncode test passed\n');
+
+%% getBestColRowFit
+% We must check if the number of rows and cols are as we defined
+[cols, rows] = getBestColRowFit(2);
+assert((cols==2)&(rows==1));
+[cols, rows] = getBestColRowFit(4);
+assert((cols==2)&(rows==2));
+[cols, rows] = getBestColRowFit(8);
+assert((cols==4)&(rows==2));
+[cols, rows] = getBestColRowFit(16);
+assert((cols==4)&(rows==4));
+
+fprintf('getBestColRowFit test passed\n');
