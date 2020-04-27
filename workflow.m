@@ -50,7 +50,7 @@ batchSize = log2(codeSize);
 hadamardMatrix = hadamard(2^(batchSize+1));
 % We keep only 2^batchSize elements from the previous matrix, discarding
 % the firs one ('allones').
-hadamardMatrix = hadamardMatrix(2:2^batchSize);
+hadamardMatrix = hadamardMatrix(2:2^batchSize,:);
 
 % frameBuffer
 % This is needed for symbol creation using a space-time approach
