@@ -8,3 +8,4 @@ else % If not, we assume that cols = rows + 1
     rows = sqrt(codeLength/2);
     cols = 2*rows;
 end
+end

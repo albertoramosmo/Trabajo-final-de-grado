@@ -4,9 +4,9 @@ function encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,alpha,si
 % We allocate memory for the encodedBuffer
 encodedBuffer = zeros(size(frameBuffer));
 
-% We get from frameBuffer the width and heigth of the images
+% We get from frameBuffer the width and height of the images
 width = size(frameBuffer, 1);
-heigth = size(frameBuffer, 2);
+height = size(frameBuffer, 2);
 
 % From encodedBits we get the grid size (we must determine if it is a exact
 % square of just an exact log2)
@@ -21,7 +21,7 @@ encodedBits = reshape(encodedBits, rows,cols);
 
 % Now we set the colSize and rowSize referred to the image size
 colSize = floor(width/cols);
-rowSize = floor(heigth/rows);
+rowSize = floor(height/rows);
 
 % Now we must generate the codes using the corresponding size
 codeImage = ones(size(frameBuffer,1), ...
@@ -50,4 +50,5 @@ timeCoeff = linspace(-1, 1, N);
 for I = 2:length(timeCoeff)
     T = timeCoeff(I);
     encodedBuffer(:,:,:,I) = T*codeImage/255 + frameBuffer(:,:,:,I);
+end
 end

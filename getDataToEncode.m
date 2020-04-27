@@ -23,3 +23,4 @@ end
 
 databits = [dataBuffer(dataPointer:dataPointer+realBatchSize-1), ...
             zeros(1,batchSize-realBatchSize)];
+end

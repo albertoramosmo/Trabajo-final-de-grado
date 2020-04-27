@@ -27,3 +27,4 @@ SIR = 10*log10(S/I);
 % No hace falta hacer un if-else, ya que la salida es una comparación con
 % un umbral.
 cond = SIR >= threshold;
+end
