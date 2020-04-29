@@ -5,8 +5,8 @@ function encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,alpha,si
 encodedBuffer = zeros(size(frameBuffer));
 
 % We get from frameBuffer the width and height of the images
-width = size(frameBuffer, 1);
-height = size(frameBuffer, 2);
+width = size(frameBuffer, 2); % Width is in the cols dimension
+height = size(frameBuffer, 1); % Height is in the rows dimension
 
 % From encodedBits we get the grid size (we must determine if it is a exact
 % square of just an exact log2)
