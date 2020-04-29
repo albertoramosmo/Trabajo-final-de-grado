@@ -23,7 +23,7 @@ numChannels = size(videoObject.readFrame,3);
 % may take the form of a proportional value
 alpha = 5;                  % Intensity
 N = 5;                      % Interpolation samples
-sigma = 0.5;                % Spatial filter
+sigma = 5;                % Spatial filter
 tSymb = 0.05;               % Symbol time
 threshold = -10;            % SIR threshold
 
@@ -59,6 +59,7 @@ frameBuffer = zeros(height,width,numChannels,framesPerSymbol);
 framesInBuffer = 0;
 
 while hasFrame(videoObject)
+    fprintf('Fetching new frame...\n');
     frame = double(readFrame(videoObject));
     frameBuffer = shiftBuffer(frameBuffer,frame);
     % We update the framesInBuffer counter
@@ -71,18 +72,22 @@ while hasFrame(videoObject)
         
         % If dataPointer<0,  it means that we have reached the end
         if (dataPointer < 0)
+            fprintf('All data already encoded...\n');
             bypassEncoding = true;
         else
+            fprintf('Encoding bits...\n');
             encodedBits = hadamardEncode(databits, hadamardMatrix);
             bypassEncoding = false;
         end
         
     else
+        fprintf('Frame buffer not full yet...\n');
         bypassEncoding = true;
     end
     
     if ~bypassEncoding
         if canWeEncode(frameBuffer,alpha,threshold)     % True condition
+            fprintf('SIR is good enough, encoding data...\n');
             encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,alpha,sigma,N);
             writeBufferToFinalVideo(outputVideo, encodedBuffer);
             % En este punto, ya que hemos escrito lengthBuffer frames y
@@ -90,19 +95,15 @@ while hasFrame(videoObject)
             % contador de frames en el buffer para que vuelva a llenarse.
             framesInBuffer = 0;
         else                                            % False condition
+            fprintf('SIR is poor, writing data without encoding...\n');
             % Si no puedes codificar, debes escribir en el video el frame
             % mas viejo dentro de la FIFO. Es el último de la lista ya que
             % hemos hecho una FIFO que "empuja" desde el principio.
             writeFrameToFinalVideo(outputVideo, squeeze(frameBuffer(:,:,:,end)));
         end
     end
+    fprintf('\n');
 end
 
 close(outputVideo);
-
-%%
-v=VideoReader('outputVideo.avi');
-while(hasFrame(v))
-    imshow(readFrame(v));
-end
 

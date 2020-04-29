@@ -47,8 +47,8 @@ codeImage = imgaussfilt(codeImage, sigma);
 % Finally, we must interpolate
 timeCoeff = linspace(-1, 1, N);
 
-for I = 2:length(timeCoeff)
+for I = 1:length(timeCoeff)
     T = timeCoeff(I);
-    encodedBuffer(:,:,:,I) = T*codeImage/255 + frameBuffer(:,:,:,I);
+    encodedBuffer(:,:,:,I) = T*codeImage + frameBuffer(:,:,:,I);
 end
 end
