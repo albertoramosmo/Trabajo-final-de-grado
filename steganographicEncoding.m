@@ -47,8 +47,12 @@ codeImage = imgaussfilt(codeImage, sigma);
 % Finally, we must interpolate
 timeCoeff = linspace(-1, 1, N);
 
+% 
+pattern(1:floor(N/2)) = linspace(0, alpha, floor(N/2));
+pattern(round(N/2):N) = linspace(0, -alpha, round(N/2));
+
 for I = 1:length(timeCoeff)
     T = timeCoeff(I);
-    encodedBuffer(:,:,:,I) = T*codeImage + frameBuffer(:,:,:,I);
+    encodedBuffer(:,:,:,I) = imfilter((T*codeImage + frameBuffer(:,:,:,I)),pattern);
 end
 end
