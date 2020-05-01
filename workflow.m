@@ -23,7 +23,7 @@ numChannels = size(videoObject.readFrame,3);
 % may take the form of a proportional value
 alpha = 5;                  % Intensity
 N = 5;                      % Interpolation samples
-sigma = 5;                % Spatial filter
+sigma = 5;                  % Spatial filter
 tSymb = 0.05;               % Symbol time
 threshold = -10;            % SIR threshold
 

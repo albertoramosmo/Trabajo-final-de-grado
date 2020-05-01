@@ -47,12 +47,15 @@ codeImage = imgaussfilt(codeImage, sigma);
 % Finally, we must interpolate
 timeCoeff = linspace(-1, 1, N);
 
-% 
+% Pulse shaping
 pattern(1:floor(N/2)) = linspace(0, alpha, floor(N/2));
 pattern(round(N/2):N) = linspace(0, -alpha, round(N/2));
+% F = fft(pattern);
+% S = abs(F);
+% S2 = log(1+S);
 
 for I = 1:length(timeCoeff)
     T = timeCoeff(I);
-    encodedBuffer(:,:,:,I) = imfilter((T*codeImage + frameBuffer(:,:,:,I)),pattern);
+    encodedBuffer(:,:,:,I) = imfilter(T*codeImage,pattern) + frameBuffer(:,:,:,I);
 end
 end
