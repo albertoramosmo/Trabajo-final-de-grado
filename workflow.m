@@ -9,23 +9,23 @@ filename = 'mountain100.mp4';
 % Video de entrada
 videoObject = VideoReader(filename);
 
-% Video de salida
-outputVideo = VideoWriter('outputVideo.avi');
-open(outputVideo);
-
 % Needed variables to carry out the encoding
 fps     = videoObject.FrameRate;
 width   = videoObject.Width;
 height  = videoObject.Height;
 numChannels = size(videoObject.readFrame,3);
 
+% Video de salida
+outputVideo = VideoWriter('outputVideo.avi');
+outputVideo.FrameRate = fps;
+open(outputVideo);
+
 % In this first approach we are using an absolute value for alpha, but it
 % may take the form of a proportional value
-alpha = 5;                  % Intensity
-N = 5;                      % Interpolation samples
-sigma = 5;                  % Spatial filter
+alpha = 2;                  % Intensity
+sigma = 15;                  % Spatial filter
 tSymb = 0.05;               % Symbol time
-threshold = -10;            % SIR threshold
+threshold = 0;            % SIR threshold
 
 framesPerSymbol = calculateFramesPerSymbol(fps,tSymb);
 
@@ -59,49 +59,65 @@ frameBuffer = zeros(height,width,numChannels,framesPerSymbol);
 framesInBuffer = 0;
 
 while hasFrame(videoObject)
-    fprintf('Fetching new frame...\n');
+    
     frame = double(readFrame(videoObject));
     frameBuffer = shiftBuffer(frameBuffer,frame);
+    
     % We update the framesInBuffer counter
     framesInBuffer = framesInBuffer + 1;
+    fprintf('Fetched a new frame... %d/%d\n',...
+        framesInBuffer, ...
+        framesPerSymbol);
     
-    if framesInBuffer > framesPerSymbol
-        framesInBuffer = framesPerSymbol;
-        
-        [databits, dataPointer] = getDataToEncode(dataBuffer, dataPointer, batchSize);
-        
-        % If dataPointer<0,  it means that we have reached the end
-        if (dataPointer < 0)
-            fprintf('All data already encoded...\n');
-            bypassEncoding = true;
-        else
-            fprintf('Encoding bits...\n');
-            encodedBits = hadamardEncode(databits, hadamardMatrix);
-            bypassEncoding = false;
-        end
-        
-    else
+    % We have filled the buffer
+    if framesInBuffer < framesPerSymbol
         fprintf('Frame buffer not full yet...\n');
+        bypassEncoding = true;
+    else
+        bypassEncoding = false;
+    end
+    
+    % If dataPointer<0,  it means that we have reached the end
+    if (dataPointer < 0)
+        fprintf('All data already encoded...\n');
         bypassEncoding = true;
     end
     
     if ~bypassEncoding
-        if canWeEncode(frameBuffer,alpha,threshold)     % True condition
+        [goEncode, calculatedSIR] = canWeEncode(frameBuffer,alpha,threshold);
+        fprintf('Current SIR: %f -->',calculatedSIR);
+        if goEncode
+            
+            % If we can endode, we pull some data bits
+            [databits, dataPointer] = getDataToEncode(dataBuffer, dataPointer, batchSize);
+            
+            fprintf('Encoding bits...\n');
+            encodedBits = hadamardEncode(databits, hadamardMatrix);
+            bypassEncoding = false;
+            
             fprintf('SIR is good enough, encoding data...\n');
-            encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,alpha,sigma,N);
+            encodedBuffer = steganographicEncoding(frameBuffer,...
+                encodedBits,...
+                alpha,...
+                sigma,...
+                framesPerSymbol);
+            
             writeBufferToFinalVideo(outputVideo, encodedBuffer);
+            
             % En este punto, ya que hemos escrito lengthBuffer frames y
             % hemos vaciado teóricamente el buffer, vamos a inicializar el
             % contador de frames en el buffer para que vuelva a llenarse.
             framesInBuffer = 0;
-        else                                            % False condition
+        else
             fprintf('SIR is poor, writing data without encoding...\n');
             % Si no puedes codificar, debes escribir en el video el frame
             % mas viejo dentro de la FIFO. Es el último de la lista ya que
             % hemos hecho una FIFO que "empuja" desde el principio.
             writeFrameToFinalVideo(outputVideo, squeeze(frameBuffer(:,:,:,end)));
+            framesInBuffer = framesInBuffer - 1;
         end
     end
+    
     fprintf('\n');
 end
 

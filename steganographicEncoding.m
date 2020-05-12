@@ -25,8 +25,8 @@ rowSize = floor(height/rows);
 
 % Now we must generate the codes using the corresponding size
 codeImage = ones(size(frameBuffer,1), ...
-                  size(frameBuffer,2), ...
-                  size(frameBuffer,3));
+    size(frameBuffer,2), ...
+    size(frameBuffer,3));
 
 % We iterate to create our image
 for I = 1:rows
@@ -42,18 +42,18 @@ end
 
 % codeImage is the first one, now we must apply image filtering to reduce
 % the spatial frequency of the image.
-codeImage = imgaussfilt(codeImage, sigma);              
+codeImage = imgaussfilt(codeImage, sigma);
 
 % Finally, we must interpolate
 %timeCoeff = linspace(-1, 1, N);
 
 % Pulse shaping
 pattern(1:floor(N/2)) = linspace(0, alpha, floor(N/2));
-pattern(round(N/2):N) = linspace(0, -alpha, round(N/2));
+pattern(ceil(N/2):N) = linspace(0, -alpha, ceil(N/2));
 
-for I = 1:length(pattern)
+for I = 1:size(frameBuffer, 4)
     %T = timeCoeff(I);
-    P = pattern(I)/255;
+    P = pattern(I);
     %encodedBuffer(:,:,:,I) = T*codeImage + frameBuffer(:,:,:,I);
     encodedBuffer(:,:,:,I) = P*codeImage + frameBuffer(:,:,:,I);
 end
