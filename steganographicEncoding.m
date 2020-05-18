@@ -49,7 +49,7 @@ codeImage = imgaussfilt(codeImage, sigma);
 
 % Pulse shaping
 % 0 -> -0.5 -> -1 -> -0.5 -> 0 -> 0.5 -> 1 -> 0.5 -> 0
-pattern(1:3) = linspace(0, -alpha, 3);
+pattern(1:3) = linspace(0, -1, 3);
 pattern(4:6) = linspace(-0.5, 0.5,3);
 pattern(7:8) = linspace(1, 0.5, 2);
 
@@ -57,6 +57,6 @@ for I = 1:size(frameBuffer, 4)
     %T = timeCoeff(I);
     P = pattern(I);
     %encodedBuffer(:,:,:,I) = T*codeImage + frameBuffer(:,:,:,I);
-    encodedBuffer(:,:,:,I) = P*codeImage + frameBuffer(:,:,:,I);
+    encodedBuffer(:,:,:,I) = P*codeImage(:,:,1) + frameBuffer(:,:,:,I);
 end
 end

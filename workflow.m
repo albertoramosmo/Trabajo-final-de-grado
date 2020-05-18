@@ -4,7 +4,7 @@
 % Fecha: Abril 2020
 
 % STEGANOGRAPHY WORKFLOW %
-filename = 'mountain100.mp4';
+filename = 'mountain50.mp4';
 
 % Video de entrada
 videoObject = VideoReader(filename);
