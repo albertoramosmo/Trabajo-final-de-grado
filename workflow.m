@@ -16,7 +16,7 @@ height  = videoObject.Height;
 numChannels = size(videoObject.readFrame,3);
 
 % Video de salida
-outputVideo = VideoWriter('outputVideo.avi');
+outputVideo = VideoWriter('outputVideo','MPEG-4');
 outputVideo.FrameRate = fps;
 open(outputVideo);
 

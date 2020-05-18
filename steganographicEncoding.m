@@ -48,8 +48,10 @@ codeImage = imgaussfilt(codeImage, sigma);
 %timeCoeff = linspace(-1, 1, N);
 
 % Pulse shaping
-pattern(1:floor(N/2)) = linspace(0, alpha, floor(N/2));
-pattern(ceil(N/2):N) = linspace(0, -alpha, ceil(N/2));
+% 0 -> -0.5 -> -1 -> -0.5 -> 0 -> 0.5 -> 1 -> 0.5 -> 0
+pattern(1:3) = linspace(0, -alpha, 3);
+pattern(4:6) = linspace(-0.5, 0.5,3);
+pattern(7:8) = linspace(1, 0.5, 2);
 
 for I = 1:size(frameBuffer, 4)
     %T = timeCoeff(I);
