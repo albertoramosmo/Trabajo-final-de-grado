@@ -16,18 +16,18 @@ height  = videoObject.Height;
 numChannels = size(videoObject.readFrame,3);
 
 % Video de salida
-outputVideo = VideoWriter('outputVideo','MPEG-4');
+outputVideo = VideoWriter('outputVideo'); %,'MPEG-4');
 outputVideo.FrameRate = fps;
 open(outputVideo);
 
 % In this first approach we are using an absolute value for alpha, but it
 % may take the form of a proportional value
-alpha = 2;                  % Intensity
+alpha = 5;                  % Intensity
 sigma = 15;                  % Spatial filter
-tSymb = 0.05;               % Symbol time
 threshold = 0;            % SIR threshold
 
-framesPerSymbol = calculateFramesPerSymbol(fps,tSymb);
+framesPerSymbol = 10; %calculateFramesPerSymbol(fps,tSymb);
+shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % Code size (must be exact log2)
 codeRows = 4;
@@ -99,8 +99,7 @@ while hasFrame(videoObject)
             encodedBuffer = steganographicEncoding(frameBuffer,...
                 encodedBits,...
                 alpha,...
-                sigma,...
-                framesPerSymbol);
+                sigma, shaping);
             
             writeBufferToFinalVideo(outputVideo, encodedBuffer);
             

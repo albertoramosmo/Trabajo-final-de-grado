@@ -1,4 +1,5 @@
-function encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,alpha,sigma,N)
+function encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,...
+                                                alpha,sigma, shaping)
 % This function encodes data
 
 % We allocate memory for the encodedBuffer
@@ -25,8 +26,7 @@ rowSize = floor(height/rows);
 
 % Now we must generate the codes using the corresponding size
 codeImage = ones(size(frameBuffer,1), ...
-    size(frameBuffer,2), ...
-    size(frameBuffer,3));
+    size(frameBuffer,2));
 
 % We iterate to create our image
 for I = 1:rows
@@ -49,14 +49,15 @@ codeImage = imgaussfilt(codeImage, sigma);
 
 % Pulse shaping
 % 0 -> -0.5 -> -1 -> -0.5 -> 0 -> 0.5 -> 1 -> 0.5 -> 0
-pattern(1:3) = linspace(0, -1, 3);
-pattern(4:6) = linspace(-0.5, 0.5,3);
-pattern(7:8) = linspace(1, 0.5, 2);
 
-for I = 1:size(frameBuffer, 4)
-    %T = timeCoeff(I);
-    P = pattern(I);
-    %encodedBuffer(:,:,:,I) = T*codeImage + frameBuffer(:,:,:,I);
-    encodedBuffer(:,:,:,I) = P*codeImage(:,:,1) + frameBuffer(:,:,:,I);
+index = 1;
+% This operation can be parallelized using filter function and operating in
+% a pixel basis
+for P = shaping
+    % We add the information only on the blue channel
+    encodedBuffer(:,:,:,index) = frameBuffer(:,:,:,index);
+    encodedBuffer(:,:,3,index) = encodedBuffer(:,:,3,index) + ...
+        P*codeImage;
+    index = index + 1;
 end
 end
