@@ -14,11 +14,16 @@ imgdiff    = imgFinal - imgInicial;
 % Interference Average Power
 I = mean(imgdiff.^2,'all');
 
+% Proportion es el numero de pixels que supera el umbral
+condition_A = imgInicial(:,:,3)>=threshold;
+condition_B = imgFinal(:,:,3)>=threshold;
+proportion = sum(condition_A)+sum(condition_B);
+
 % Signal Average Power (2 alpha es porque el código, al presentarse
 % invertido en imgInicial e imgFinal, duplica su valor con la diferencia.
 % Además, no hace falta el coeficiente 0.5 porque todos los bits tienen la
 % misma energía).
-S = (2*alpha)^2;
+S = 4*(alpha^2)*proportion;
 
 % Calculate Signal-to-Interference-Ratio
 SIR = 10*log10(S/I);
