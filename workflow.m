@@ -31,29 +31,24 @@ sensitivity = 70;         % Minimum blue value to ensure detection
 framesPerSymbol = 10; %calculateFramesPerSymbol(fps,tSymb);
 shaping = getSymbolShape(framesPerSymbol, 0.5);
 
-% Code size (must be exact log2)
-codeRows = 4;
-codeCols = 4;
-codeSize = codeRows*codeCols;
-
 % We create a random number of data bits to encode, 1000 bits for instance
 dataBuffer = randi([0,1], 1, 1000);
 % Pointer to the next batch of data to encode
 dataPointer = 1;
 
-% These bits will be properly encoded using Hadamard codes in order to be
-% robust againts errors, video image interference, etc...
-% batchSize determines how many bits must be taken on each iteration. This
-% size depends on the encoding procedure. In this version, we are taking 4
-% bits, resulting in 16 different patterns to include into the image. But
-% since we are using Hadamard matrices to determine this and the 'all-ones'
-% symbol is not possible, we new 2^(batchSize+1)
-batchSize = log2(codeSize);
+% We define the batch size and then we adjust the number of cols and rows
+% of the code
+batchSize = 4;
+
+% Code size (must be exact log2).
+codeSize = 2^batchSize;
+
 
 hadamardMatrix = hadamard(2^(batchSize+1));
 % We keep only 2^batchSize elements from the previous matrix, discarding
 % the firs one ('allones').
-hadamardMatrix = hadamardMatrix(2:2^batchSize+1,:);
+[codeCols,codeRows] = getBestColRowFit(size(hadamardMatrix,1));
+hadamardMatrix = hadamardMatrix(2:codeSize+1,:);
 
 % frameBuffer
 % This is needed for symbol creation using a space-time approach
