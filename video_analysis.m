@@ -1,6 +1,6 @@
 %% VIDEO ANALYSIS
 
-videoObject = VideoReader('Captured_video_2.mp4');
+videoObject = VideoReader('prueba50fps.mp4');
 
 capture_fps     = videoObject.FrameRate;
 width           = videoObject.Width;
@@ -8,7 +8,7 @@ height          = videoObject.Height;
 numChannels     = size(videoObject.readFrame,3);
 
 % Original video fps
-original_fps = 100;
+original_fps = 50;
 
 % Compression ratio to estimate the position of the new max and min values
 % within the buffer
@@ -79,7 +79,7 @@ while (hasFrame(videoObject))
     % best candidate
     result = hadamardMatrix*chips
     find(result == max(result))
-%     pottsOutput(result)
+    %pottsOutput(result)
     figure(2);
     plot(chips);
     
