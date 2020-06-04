@@ -33,6 +33,7 @@ shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % We create a random number of data bits to encode, 1000 bits for instance
 dataBuffer = randi([0,1], 1, 1000);
+save('dataBuffer100.mat','dataBuffer');
 % Pointer to the next batch of data to encode
 dataPointer = 1;
 
