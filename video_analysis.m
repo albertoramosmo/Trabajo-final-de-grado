@@ -1,5 +1,6 @@
 %% VIDEO ANALYSIS
 
+
 videoObject = VideoReader('Captured_video_2.mp4');
 
 capture_fps     = videoObject.FrameRate;
@@ -81,7 +82,7 @@ while (hasFrame(videoObject))
     result = pottsOutput(hadamardMatrix*chips);
     symbol_index = find(result == max(result));
     hadamardMatrix(symbol_index, :)
-    
+
     
     pause;
    

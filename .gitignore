@@ -1,3 +1,4 @@
 *.m~
 *.mp4
 *.avi
+.DS_Store/

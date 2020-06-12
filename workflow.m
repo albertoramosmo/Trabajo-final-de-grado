@@ -4,7 +4,7 @@
 % Fecha: Abril 2020
 
 % STEGANOGRAPHY WORKFLOW %
-filename = 'mountain100.mp4';
+filename = 'playa50.mp4';
 
 % Video de entrada
 videoObject = VideoReader(filename);
@@ -25,7 +25,7 @@ open(outputVideo);
 % may take the form of a proportional value
 alpha = 3;                  % Intensity
 sigma = 15;                  % Spatial filter
-threshold = 0;            % SIR threshold
+threshold = -50;            % SIR threshold
 sensitivity = 70;         % Minimum blue value to ensure detection
 
 framesPerSymbol = 10; %calculateFramesPerSymbol(fps,tSymb);
@@ -33,7 +33,7 @@ shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % We create a random number of data bits to encode, 1000 bits for instance
 dataBuffer = randi([0,1], 1, 1000);
-save('dataBuffer100.mat','dataBuffer');
+save('dataBufferPrueba.mat','dataBuffer');
 % Pointer to the next batch of data to encode
 dataPointer = 1;
 
