@@ -1,6 +1,6 @@
 %% VIDEO ANALYSIS
 
-videoObject = VideoReader('prueba50FPS.mp4');
+videoObject = VideoReader('prueba.mp4');
 
 capture_fps     = videoObject.FrameRate;
 width           = videoObject.Width;
@@ -76,9 +76,10 @@ while (hasFrame(videoObject))
     
     % We display the product against the hadamardMatrix to estimate the
     % best candidate
-    result = hadamardMatrix*chips
-    find(result == max(result))
-    pottsOutput(result)
+    result = hadamardMatrix*chips;
+    index = find(result == max(result));
+    hadamardMatrix(index,:)
+    %pottsOutput(result)
     figure(2);
     plot(chips);
     

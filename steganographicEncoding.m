@@ -43,6 +43,8 @@ end
 % codeImage is the first one, now we must apply image filtering to reduce
 % the spatial frequency of the image.
 codeImage = imgaussfilt(codeImage, sigma);
+% imshow(codeImage,[]);
+% return
 
 % Finally, we must interpolate
 %timeCoeff = linspace(-1, 1, N);
