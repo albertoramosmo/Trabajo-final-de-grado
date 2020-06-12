@@ -4,7 +4,7 @@
 % Fecha: Abril 2020
 
 % STEGANOGRAPHY WORKFLOW %
-filename = 'mountain50.mp4';
+filename = 'mountain100.mp4';
 
 % Video de entrada
 videoObject = VideoReader(filename);
@@ -16,8 +16,8 @@ height  = videoObject.Height;
 numChannels = size(videoObject.readFrame,3);
 
 % Video de salida
-% outputVideo = VideoWriter('outputVideo','MPEG-4');
-outputVideo = VideoWriter('outputVideo');
+outputVideo = VideoWriter('outputVideo','MPEG-4');
+%outputVideo = VideoWriter('outputVideo');
 outputVideo.FrameRate = fps;
 open(outputVideo);
 
@@ -33,6 +33,7 @@ shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % We create a random number of data bits to encode, 1000 bits for instance
 dataBuffer = randi([0,1], 1, 1000);
+save('dataBuffer100.mat','dataBuffer');
 % Pointer to the next batch of data to encode
 dataPointer = 1;
 

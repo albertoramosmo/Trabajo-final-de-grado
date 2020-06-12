@@ -8,7 +8,7 @@ height          = videoObject.Height;
 numChannels     = size(videoObject.readFrame,3);
 
 % Original video fps
-original_fps = 100;
+original_fps = 50;
 
 % Compression ratio to estimate the position of the new max and min values
 % within the buffer
@@ -28,7 +28,6 @@ hadamardMatrix = hadamard(2^(batchSize+1));
 [codeCols,codeRows] = getBestColRowFit(size(hadamardMatrix,1));
 hadamardMatrix = hadamardMatrix(2:codeSize+1,:);
 
-
 % Original shaping and current expected positions
 framesPerSymbol = 10;
 
@@ -41,8 +40,8 @@ min_pos = ceil(min_pos*compression_ratio);
 
 % Frame buffer
 frameBuffer = zeros(height, width, numChannels,...
-                    ceil(framesPerSymbol*compression_ratio));
-                
+    ceil(framesPerSymbol*compression_ratio));
+
 framesInBuffer = 0;
 
 % Auxiliary variables
@@ -54,10 +53,10 @@ while (hasFrame(videoObject))
     
     % We ask the user to insert the positions of the ROI (4 points romboid)
     if ~roi_selected
-       imshow(frame/255,[]);
-       [boundaries(:,2), boundaries(:,1)] = ginput(4);
-       data_positions = getDataPositions(boundaries, codeRows, codeCols);
-       roi_selected = 1;
+        imshow(frame/255,[]);
+        [boundaries(:,2), boundaries(:,1)] = ginput(4);
+        data_positions = getDataPositions(boundaries, codeRows, codeCols);
+        roi_selected = 1;
     end
     
     frameBuffer = shiftBuffer(frameBuffer, frame);
@@ -81,9 +80,9 @@ while (hasFrame(videoObject))
     % best candidate
     result = pottsOutput(hadamardMatrix*chips);
     symbol_index = find(result == max(result));
+    hadamardMatrix(symbol_index, :)
     
-    disp(hadamardMatrix(symbol_index, :))
     
     pause;
-    
+   
 end

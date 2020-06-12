@@ -47,5 +47,5 @@ for J = 1:length(col_iterator)
     end
 end
 
-
 data_positions = [pos_row;pos_col];
+end
