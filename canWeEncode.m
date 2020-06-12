@@ -1,5 +1,6 @@
 function [cond,SIR]  = canWeEncode(frameBuffer, alpha, threshold, ...
-                                   sensitivity, waveform)
+                                   max_sensitivity, min_sensitivity, ...
+                                   waveform)
 % Devuelve true si se pueden meter datos teniendo en cuenta que el receptor
 % los pueda decodificar bien,y siguiendo criterios de visibilidad del codigo.
 % Se tiene que definir un estimador de la perceptibilidad del codigo por un
@@ -24,8 +25,12 @@ imgdiff    = imgFinal - imgInicial;
 I = mean(imgdiff.^2,'all');
 
 % Proportion es el numero de pixels que supera el umbral
-condition_A = imgInicial(:,:,3)>=sensitivity;
-condition_B = imgFinal(:,:,3)>=sensitivity;
+condition_A = (imgInicial(:,:,3)>=min_sensitivity) & ...
+              (imgInicial(:,:,3)<=max_sensitivity);
+          
+condition_B = (imgFinal(:,:,3)>=min_sensitivity) & ...
+              (imgFinal(:,:,3)<=max_sensitivity);
+          
 proportion = sum(condition_A & condition_B, 'all')/length(condition_A(:));
 
 % Signal Average Power (2 alpha es porque el código, al presentarse

@@ -1,7 +1,7 @@
 %% VIDEO ANALYSIS
 
 
-videoObject = VideoReader('Captured_video_2.mp4');
+videoObject = VideoReader('prueba.mp4');
 
 capture_fps     = videoObject.FrameRate;
 width           = videoObject.Width;
@@ -25,7 +25,7 @@ codeSize = 2^batchSize;
 
 hadamardMatrix = hadamard(2^(batchSize+1));
 % We keep only 2^batchSize elements from the previous matrix, discarding
-% the firs one ('allones').
+% the first one ('allones').
 [codeCols,codeRows] = getBestColRowFit(size(hadamardMatrix,1));
 hadamardMatrix = hadamardMatrix(2:codeSize+1,:);
 
@@ -75,14 +75,16 @@ while (hasFrame(videoObject))
     hold off
                                    
     % We remove outliers
-    chips(abs(chips - mean(chips)) > std(chips)) = 0;
+    %chips(abs(chips - mean(chips)) > std(chips)) = 0;
     
     % We display the product against the hadamardMatrix to estimate the
     % best candidate
-    result = pottsOutput(hadamardMatrix*chips);
+    result = pottsOutput(hadamardMatrix*chips/sum(abs(chips)));
+    if ~isnan(result(1))
+        max(result)/mean(result(result~=max(result)),'all')
+    end
     symbol_index = find(result == max(result));
     hadamardMatrix(symbol_index, :)
-
     
     pause;
    

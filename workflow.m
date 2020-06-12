@@ -4,7 +4,7 @@
 % Fecha: Abril 2020
 
 % STEGANOGRAPHY WORKFLOW %
-filename = 'playa50.mp4';
+filename = 'mountain100.mp4';
 
 % Video de entrada
 videoObject = VideoReader(filename);
@@ -16,7 +16,7 @@ height  = videoObject.Height;
 numChannels = size(videoObject.readFrame,3);
 
 % Video de salida
-outputVideo = VideoWriter('outputVideo','MPEG-4');
+outputVideo = VideoWriter('outputVideo');
 %outputVideo = VideoWriter('outputVideo');
 outputVideo.FrameRate = fps;
 open(outputVideo);
@@ -26,9 +26,10 @@ open(outputVideo);
 alpha = 3;                  % Intensity
 sigma = 15;                  % Spatial filter
 threshold = -50;            % SIR threshold
-sensitivity = 70;         % Minimum blue value to ensure detection
+min_sensitivity = 50;         % Minimum blue value to ensure detection
+max_sensitivity = 200;        % Maximum blue value to ensure detection
 
-framesPerSymbol = 10; %calculateFramesPerSymbol(fps,tSymb);
+framesPerSymbol = 10;
 shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % We create a random number of data bits to encode, 1000 bits for instance
@@ -55,6 +56,9 @@ hadamardMatrix = hadamardMatrix(2:codeSize+1,:);
 % This is needed for symbol creation using a space-time approach
 frameBuffer = zeros(height,width,numChannels,framesPerSymbol);
 framesInBuffer = 0;
+
+% Estimated SIR vector
+SIR_vector = [];
 
 while hasFrame(videoObject)
     
@@ -83,8 +87,11 @@ while hasFrame(videoObject)
     
     if ~bypassEncoding
         [goEncode, calculatedSIR] = canWeEncode(frameBuffer, alpha, ...
-                                                threshold, sensitivity,...
-                                                shaping);
+                                                threshold, max_sensitivity,...
+                                                min_sensitivity, shaping);
+                                            
+        SIR_vector = [SIR_vector calculatedSIR];
+                                            
         fprintf('Current SIR: %f -->',calculatedSIR);
         if goEncode
             
@@ -122,3 +129,4 @@ end
 
 close(outputVideo);
 
+hist(SIR_vector);
