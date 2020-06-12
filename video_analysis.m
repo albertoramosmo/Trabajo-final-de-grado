@@ -62,26 +62,27 @@ while (hasFrame(videoObject))
     
     frameBuffer = shiftBuffer(frameBuffer, frame);
     
-    diff_frame = frameBuffer(:,:,3,max_pos) - frameBuffer(:,:,3,min_pos);
-    
+    % We gather info from the diff_frame
+    % chips = gatherData(diff_frame, data_positions, -1:1);
+    [chips, diff_frame] = gatherDataWithCompensation(squeeze(frameBuffer(:,:,3,:)), ...
+                                       data_positions, ...
+                                       max_pos, min_pos, -1:1);
+
     figure(1);
-    imshow(diff_frame/255,[]);
+    imshow(diff_frame,[]);
     hold on
     scatter(data_positions(2,:), data_positions(1,:));
     hold off
-    
-    % We gather info from the diff_frame
-    chips = gatherData(diff_frame, data_positions, -1:1);
+                                   
     % We remove outliers
     chips(abs(chips - mean(chips)) > std(chips)) = 0;
     
     % We display the product against the hadamardMatrix to estimate the
     % best candidate
-    result = hadamardMatrix*chips
-    find(result == max(result))
-%     pottsOutput(result)
-    figure(2);
-    plot(chips);
+    result = pottsOutput(hadamardMatrix*chips);
+    symbol_index = find(result == max(result));
+    
+    disp(hadamardMatrix(symbol_index, :))
     
     pause;
     
