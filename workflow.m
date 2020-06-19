@@ -17,7 +17,7 @@ numChannels = size(videoObject.readFrame,3);
 
 % Video de salida
 outputVideo = VideoWriter('outputVideo');
-%outputVideo = VideoWriter('outputVideo');
+
 outputVideo.FrameRate = fps;
 open(outputVideo);
 
@@ -29,7 +29,7 @@ threshold = -50;            % SIR threshold
 min_sensitivity = 50;         % Minimum blue value to ensure detection
 max_sensitivity = 200;        % Maximum blue value to ensure detection
 
-framesPerSymbol = 10;
+framesPerSymbol = 20;
 shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % We create a random number of data bits to encode, 1000 bits for instance
@@ -44,7 +44,6 @@ batchSize = 4;
 
 % Code size (must be exact log2).
 codeSize = 2^batchSize;
-
 
 hadamardMatrix = hadamard(2^(batchSize+1));
 % We keep only 2^batchSize elements from the previous matrix, discarding

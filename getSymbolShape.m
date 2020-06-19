@@ -14,6 +14,6 @@ base_symbol = [base_symbol, -base_symbol];
 
 step = ceil(length(base_symbol)/framesPerSymbol);
 
-shaping = base_symbol(1:step:10*step);
+shaping = base_symbol(1:step:framesPerSymbol*step);
 
 end
