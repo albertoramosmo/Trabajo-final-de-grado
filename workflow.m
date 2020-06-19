@@ -4,7 +4,7 @@
 % Fecha: Abril 2020
 
 % STEGANOGRAPHY WORKFLOW %
-filename = 'mountain100.mp4';
+filename = 'birds.mp4';
 
 % Video de entrada
 videoObject = VideoReader(filename);
@@ -16,25 +16,27 @@ height  = videoObject.Height;
 numChannels = size(videoObject.readFrame,3);
 
 % Video de salida
-outputVideo = VideoWriter('outputVideo');
+finalName = 'SIR50%_F14_A10';
+outputVideo = VideoWriter(finalName,'MPEG-4');
 
 outputVideo.FrameRate = fps;
 open(outputVideo);
 
 % In this first approach we are using an absolute value for alpha, but it
 % may take the form of a proportional value
-alpha = 3;                  % Intensity
-sigma = 15;                  % Spatial filter
-threshold = -50;            % SIR threshold
+alpha = 10;                    % Intensity
+sigma = 15;                   % Spatial filter
+threshold = 4.959;              % SIR threshold
 min_sensitivity = 50;         % Minimum blue value to ensure detection
 max_sensitivity = 200;        % Maximum blue value to ensure detection
 
-framesPerSymbol = 20;
+framesPerSymbol = 14;
 shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % We create a random number of data bits to encode, 1000 bits for instance
 dataBuffer = randi([0,1], 1, 1000);
-save('dataBufferPrueba.mat','dataBuffer');
+save(finalName,'dataBuffer');
+
 % Pointer to the next batch of data to encode
 dataPointer = 1;
 
@@ -128,4 +130,4 @@ end
 
 close(outputVideo);
 
-hist(SIR_vector);
+%ecdf(SIR_vector);
