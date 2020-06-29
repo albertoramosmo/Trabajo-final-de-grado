@@ -42,7 +42,7 @@ proportion = sum(condition_A & condition_B, 'all')/length(condition_A(:));
 S = proportion*(max_waveform - min_waveform)^2*alpha^2;
 
 % Calculate Signal-to-Interference-Ratio
-SIR = 10*log10(S/I)+10*log10(32);
+SIR = 10*log10(S/I);
 
 % Condition loop
 % No hace falta hacer un if-else, ya que la salida es una comparación con
