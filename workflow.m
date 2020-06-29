@@ -4,7 +4,7 @@
 % Fecha: Abril 2020
 
 % STEGANOGRAPHY WORKFLOW %
-filename = 'birds.mp4';
+filename = 'sea50.mp4';
 
 % Video de entrada
 videoObject = VideoReader(filename);
@@ -24,13 +24,13 @@ open(outputVideo);
 
 % In this first approach we are using an absolute value for alpha, but it
 % may take the form of a proportional value
-alpha = 10;                    % Intensity
+alpha = 1;                    % Intensity
 sigma = 15;                   % Spatial filter
-threshold = 4.959;              % SIR threshold
+threshold = -50;              % SIR threshold
 min_sensitivity = 50;         % Minimum blue value to ensure detection
 max_sensitivity = 200;        % Maximum blue value to ensure detection
 
-framesPerSymbol = 14;
+framesPerSymbol = 7;
 shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % We create a random number of data bits to encode, 1000 bits for instance
@@ -57,7 +57,7 @@ hadamardMatrix = hadamardMatrix(2:codeSize+1,:);
 % This is needed for symbol creation using a space-time approach
 frameBuffer = zeros(height,width,numChannels,framesPerSymbol);
 framesInBuffer = 0;
-
+%%
 % Estimated SIR vector
 SIR_vector = [];
 
