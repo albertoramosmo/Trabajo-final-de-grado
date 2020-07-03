@@ -53,15 +53,15 @@ index = 1;
 % This operation can be parallelized using filter function and operating in
 % a pixel basis
 for P = shaping
-    % Position beacon
+    % Beacon position
     img(1:n, 1:n,1+flag) = 255;
     img(end-n:end, end-n:end,1+flag) = 255;
     img(1:n, end-n:end,1+flag) = 255;
     img(end-n:end,1:n,1+flag) = 255;
     % We add the information only on the blue channel and add beacon
-    encodedBuffer(:,:,:,index) = frameBuffer(:,:,:,index);
+    encodedBuffer(:,:,:,index) = frameBuffer(:,:,:,index)+img(:,:,1+flag);
     encodedBuffer(:,:,3,index) = encodedBuffer(:,:,3,index) + ...
-        P*codeImage+img;
+        P*codeImage;
     index = index + 1;
 end
 end
