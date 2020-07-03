@@ -61,7 +61,7 @@ for P = shaping
     % We add the information only on the blue channel and add beacon
     encodedBuffer(:,:,:,index) = frameBuffer(:,:,:,index);
     encodedBuffer(:,:,3,index) = encodedBuffer(:,:,3,index) + ...
-        P*codeImage+img(:,:,1+flag);
+        P*codeImage+img;
     index = index + 1;
 end
 end
