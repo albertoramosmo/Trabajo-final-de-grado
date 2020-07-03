@@ -4,7 +4,7 @@
 % Fecha: Abril 2020
 
 % STEGANOGRAPHY WORKFLOW %
-filename = 'sea50.mp4';
+filename = 'sea.mp4';
 
 % Video de entrada
 videoObject = VideoReader(filename);
@@ -16,7 +16,7 @@ height  = videoObject.Height;
 numChannels = size(videoObject.readFrame,3);
 
 % Video de salida
-finalName = 'SIR50%_F14_A10';
+finalName = 'prueba';
 outputVideo = VideoWriter(finalName,'MPEG-4');
 
 outputVideo.FrameRate = fps;
@@ -24,7 +24,7 @@ open(outputVideo);
 
 % In this first approach we are using an absolute value for alpha, but it
 % may take the form of a proportional value
-alpha = 1;                    % Intensity
+alpha = 10;                    % Intensity
 sigma = 15;                   % Spatial filter
 threshold = -50;              % SIR threshold
 min_sensitivity = 50;         % Minimum blue value to ensure detection
@@ -35,10 +35,14 @@ shaping = getSymbolShape(framesPerSymbol, 0.5);
 
 % We create a random number of data bits to encode, 1000 bits for instance
 dataBuffer = randi([0,1], 1, 1000);
-save(finalName,'dataBuffer');
 
 % Pointer to the next batch of data to encode
 dataPointer = 1;
+flag = 0;
+count = 0;
+
+% Beacon Size
+n = 20;
 
 % We define the batch size and then we adjust the number of cols and rows
 % of the code
@@ -57,12 +61,12 @@ hadamardMatrix = hadamardMatrix(2:codeSize+1,:);
 % This is needed for symbol creation using a space-time approach
 frameBuffer = zeros(height,width,numChannels,framesPerSymbol);
 framesInBuffer = 0;
-%%
+
 % Estimated SIR vector
 SIR_vector = [];
 
 while hasFrame(videoObject)
-    
+    count = count+1;
     frame = double(readFrame(videoObject));
     frameBuffer = shiftBuffer(frameBuffer,frame);
     
@@ -107,8 +111,8 @@ while hasFrame(videoObject)
             encodedBuffer = steganographicEncoding(frameBuffer,...
                 encodedBits,...
                 alpha,...
-                sigma, shaping);
-            
+                sigma, shaping, flag,n);
+            flag = ~flag;
             writeBufferToFinalVideo(outputVideo, encodedBuffer);
             
             % En este punto, ya que hemos escrito lengthBuffer frames y
@@ -131,3 +135,5 @@ end
 close(outputVideo);
 
 %ecdf(SIR_vector);
+save('contador','count');
+save(finalName,'encodedBits');

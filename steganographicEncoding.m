@@ -1,5 +1,5 @@
 function encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,...
-                                                alpha,sigma, shaping)
+    alpha,sigma, shaping,flag,n)
 % This function encodes data
 
 % We allocate memory for the encodedBuffer
@@ -25,6 +25,9 @@ colSize = floor(width/cols);
 rowSize = floor(height/rows);
 
 % Now we must generate the codes using the corresponding size
+img = ones(size(frameBuffer,1), ...
+    size(frameBuffer,2),3);
+
 codeImage = ones(size(frameBuffer,1), ...
     size(frameBuffer,2));
 
@@ -46,20 +49,19 @@ codeImage = imgaussfilt(codeImage, sigma);
 % imshow(codeImage,[]);
 % return
 
-% Finally, we must interpolate
-%timeCoeff = linspace(-1, 1, N);
-
-% Pulse shaping
-% 0 -> -0.5 -> -1 -> -0.5 -> 0 -> 0.5 -> 1 -> 0.5 -> 0
-
 index = 1;
 % This operation can be parallelized using filter function and operating in
 % a pixel basis
 for P = shaping
-    % We add the information only on the blue channel
+    % Position beacon
+    img(1:n, 1:n,1+flag) = 255;
+    img(end-n:end, end-n:end,1+flag) = 255;
+    img(1:n, end-n:end,1+flag) = 255;
+    img(end-n:end,1:n,1+flag) = 255;
+    % We add the information only on the blue channel and add beacon
     encodedBuffer(:,:,:,index) = frameBuffer(:,:,:,index);
     encodedBuffer(:,:,3,index) = encodedBuffer(:,:,3,index) + ...
-        P*codeImage;
+        P*codeImage+img(:,:,1+flag);
     index = index + 1;
 end
 end
