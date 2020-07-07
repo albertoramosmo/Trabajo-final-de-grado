@@ -144,4 +144,4 @@ close(outputVideo);
 % We truncate databits to the number of bits we sent
 encodedBits = dataBuffer(1:dataPointer);
 
-save(finalName,'encodedBits');
+save(strcat(finalName,'.mat'),'encodedBits');
