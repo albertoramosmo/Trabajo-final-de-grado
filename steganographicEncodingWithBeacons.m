@@ -1,5 +1,5 @@
-function encodedBuffer = steganographicEncoding(frameBuffer,encodedBits,...
-    alpha,sigma, shaping)
+function encodedBuffer = steganographicEncodingWithBeacons(frameBuffer,encodedBits,...
+    alpha,sigma, shaping, flag, beacon_size)
 % This function encodes data
 
 % We allocate memory for the encodedBuffer
@@ -23,10 +23,6 @@ encodedBits = reshape(encodedBits, rows,cols);
 % Now we set the colSize and rowSize referred to the image size
 colSize = floor(width/cols);
 rowSize = floor(height/rows);
-
-% Now we must generate the codes using the corresponding size
-img = ones(size(frameBuffer,1), ...
-    size(frameBuffer,2),3);
 
 codeImage = ones(size(frameBuffer,1), ...
     size(frameBuffer,2));
@@ -53,10 +49,26 @@ index = 1;
 % This operation can be parallelized using filter function and operating in
 % a pixel basis
 for P = shaping
+    
+    
     % We add the information only on the blue channel and add beacon
-    encodedBuffer(:,:,:,index) = frameBuffer(:,:,:,index);
-    encodedBuffer(:,:,3,index) = encodedBuffer(:,:,3,index) + ...
+    image_buffer = frameBuffer(:,:,:,index);
+    image_buffer(:,:,3) = image_buffer(:,:,3) + ...
         P*codeImage;
+
+    image_buffer(1:beacon_size,       1:beacon_size, :) = 0;
+    image_buffer(1:beacon_size,       1:beacon_size,       1+flag) = 255;
+    
+    image_buffer(1:beacon_size,       end-beacon_size:end, :) = 0;
+    image_buffer(1:beacon_size,       end-beacon_size:end, 1+flag) = 255;
+    
+    image_buffer(end-beacon_size:end, 1:beacon_size, :) = 0;
+    image_buffer(end-beacon_size:end, 1:beacon_size,       1+flag) = 255;
+    
+    image_buffer(end-beacon_size:end, end-beacon_size:end, :) = 0;
+    image_buffer(end-beacon_size:end, end-beacon_size:end, 1+flag) = 255;
+    
+    encodedBuffer(:,:,:,index) = image_buffer;
     index = index + 1;
 end
 end
