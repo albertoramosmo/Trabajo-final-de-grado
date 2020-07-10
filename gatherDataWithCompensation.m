@@ -26,7 +26,7 @@ if ((length(pointsA) < 3) && (length(pointsB) < 3))
     last_frame_transformed = last_frame;
 
 else
-    fprintf('Enough points to carry out warping\n');
+%     fprintf('Enough points to carry out warping\n');
     [tform, ~, ~] = estimateGeometricTransform(...
         pointsB, pointsA, 'affine');
     
