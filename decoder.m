@@ -55,9 +55,12 @@ videoObject.CurrentTime = 0;
 % Black screen detection
 synchronized = 0;
 
-
+% Timing
+times = 16.78*(0:27);
 
 last_anchor_type = 0;
+
+times_position = 1;
 
 for framesPerSymbol = FRAMES
     shaping = getSymbolShape(framesPerSymbol, 0.5);
@@ -70,27 +73,20 @@ for framesPerSymbol = FRAMES
     
     for alpha = ALPHA
         for sir = SIR
+            videoObject.CurrentTime = times(times_position);
+            
             METRIC = [];
             METRIC_TYPE = [];
-            
-            histogram_count = 0;
+            DECIDED_SYMBOL = [];
             
             fprintf('SIR: %1.2f, ALPHA: %1.2f, FPSymb: %d\n',sir,alpha,framesPerSymbol);
             % Frame buffer
             frameBuffer = zeros(height, width, numChannels,...
                 ceil(framesPerSymbol*compression_ratio));
-            frames_to_skip = ceil(framesPerSymbol*compression_ratio)-3;
             
-            % Wait for the end of the black transition
-            frame = double(readFrame(videoObject));
-            while(isBlackScreen(frame, data_positions))
-                frame = double(readFrame(videoObject));
-            end
+            histogram_count = 0;
             
-            skip_frames = 0;
-            % We must check whether the video has ended or not
-            while (~isBlackScreen(frame, data_positions))
-                
+            while(videoObject.CurrentTime < times(times_position+1))
                 % We capture a new frame
                 frame = double(readFrame(videoObject));
                 
@@ -105,13 +101,6 @@ for framesPerSymbol = FRAMES
                 
                 % 0 for red, 1 for green, and -1 for nothing
                 anchor_type = gatherAnchor(frameBuffer(:,:,:,max_pos), anchor_positions);
-
-                % We show the frame
-                %     figure(1);
-                %     imshow(diff_frame,[]);
-                %     hold on
-                %     scatter(data_positions(2,:), data_positions(1,:));
-                %     hold off
                 
                 % We display the product against the hadamardMatrix to estimate the
                 % best candidate
@@ -128,6 +117,7 @@ for framesPerSymbol = FRAMES
                 
                 METRIC(end+1) = metric;
                 METRIC_TYPE(end+1) = anchor_type;
+                [~,DECIDED_SYMBOL(end+1)] = max(result);
                 
                 if (~mod(histogram_count,10))
                     fprintf('Current Time: %1.2f\n', videoObject.CurrentTime);
@@ -135,7 +125,7 @@ for framesPerSymbol = FRAMES
                 histogram_count = histogram_count + 1;
                 
             end
-            save(sprintf('FPS%d_alpha%d_SIR%d', framesPerSymbol, alpha, sir),'METRIC', 'METRIC_TYPE');
+            save(sprintf('FPS%d_alpha%d_SIR%d', framesPerSymbol, alpha, sir),'METRIC', 'METRIC_TYPE','DECIDED_SYMBOL');
         end
     end
 end
