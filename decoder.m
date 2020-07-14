@@ -94,10 +94,7 @@ for framesPerSymbol = FRAMES
                 frameBuffer = shiftBuffer(frameBuffer, frame);
                 
                 % We gather info from the diff_frame
-                % chips = gatherData(diff_frame, data_positions, -1:1);
-                [chips, diff_frame] = gatherDataWithCompensation(squeeze(frameBuffer(:,:,3,:)), ...
-                    data_positions, ...
-                    max_pos, min_pos, -1:1);
+                chips = gatherData(frameBuffer, data_positions, max_pos, min_pos, -1:1);
                 
                 % 0 for red, 1 for green, and -1 for nothing
                 anchor_type = gatherAnchor(frameBuffer(:,:,:,max_pos), anchor_positions);
